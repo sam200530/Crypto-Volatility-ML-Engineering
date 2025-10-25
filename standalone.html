@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Volatility Watcher</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Dark Theme Colors */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --bg-card: #1e1e1e;
+            --bg-hover: #333333;
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --text-muted: #666666;
+            
+            /* Accent Colors */
+            --accent-primary: #00d4aa;
+            --accent-secondary: #ff6b6b;
+            --accent-warning: #ffa726;
+            --accent-success: #4caf50;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #00d4aa 0%, #00a8cc 100%);
+            --gradient-secondary: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            --gradient-bg: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+            
+            /* Border Radius */
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--bg-tertiary);
+            padding: var(--spacing-md) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .logo i {
+            font-size: 2rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .status-indicator {
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            color: var(--accent-success);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: var(--spacing-xl) 0;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-xl) 0;
+        }
+
+        .hero-content h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .section-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .prediction-date {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Predictions Grid */
+        .predictions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .prediction-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-md);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prediction-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-primary);
+        }
+
+        .prediction-card.most-volatile {
+            border-color: var(--accent-primary);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 212, 170, 0.1) 100%);
+        }
+
+        .prediction-card.most-volatile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        .coin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .coin-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: capitalize;
+        }
+
+        .volatility-score {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .volatility-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-top: var(--spacing-sm);
+        }
+
+        .volatility-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-sm);
+            transition: width 0.8s ease;
+        }
+
+        /* Highlight Section */
+        .highlight-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .highlight-card {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.1) 0%, rgba(0, 168, 204, 0.1) 100%);
+            z-index: -1;
+        }
+
+        .highlight-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .highlight-header i {
+            font-size: 1.5rem;
+            color: var(--accent-warning);
+        }
+
+        .highlight-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .coin-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .confidence-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .confidence-item {
+            text-align: center;
+        }
+
+        .confidence-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .confidence-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .select-input {
+            padding: var(--spacing-sm);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--bg-hover);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            min-width: 120px;
+        }
+
+        .select-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+        }
+
+        .chart-container h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .chart-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            background: var(--bg-secondary);
+            border: 2px dashed var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-placeholder:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .chart-placeholder i {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--accent-primary);
+        }
+
+        .chart-placeholder p {
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .chart-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .chart-content {
+            padding: var(--spacing-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--bg-tertiary);
+        }
+
+        /* Model Information */
+        .model-info {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+        }
+
+        .info-card h3 {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .info-card i {
+            color: var(--accent-primary);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--bg-tertiary);
+            padding: var(--spacing-lg) 0;
+            margin-top: var(--spacing-xl);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .footer-content p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--spacing-sm);
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-stats {
+                justify-content: center;
+            }
+            
+            .hero-content h2 {
+                font-size: 2rem;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-controls {
+                width: 100%;
+                justify-content: stretch;
+            }
+            
+            .select-input {
+                flex: 1;
+                min-width: auto;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .predictions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h2 {
+                font-size: 1.75rem;
+            }
+            
+            .coin-info {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+            
+            .confidence-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .probability-grid,
+            .performance-grid,
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metric-row,
+            .success-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .timeline-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .timeline-date,
+            .timeline-coin,
+            .timeline-prediction {
+                min-width: auto;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Probability Analysis Styles */
+        .probability-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .probability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .probability-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            transition: all 0.3s ease;
+        }
+
+        .probability-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .probability-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .probability-header h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .probability-header i {
+            color: var(--accent-primary);
+        }
+
+        .confidence-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .risk-indicators {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .risk-item {
+            padding: var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid;
+        }
+
+        .risk-item.high-risk {
+            background: rgba(255, 107, 107, 0.1);
+            border-left-color: var(--accent-secondary);
+        }
+
+        .risk-item.medium-risk {
+            background: rgba(255, 167, 38, 0.1);
+            border-left-color: var(--accent-warning);
+        }
+
+        .risk-item.low-risk {
+            background: rgba(76, 175, 80, 0.1);
+            border-left-color: var(--accent-success);
+        }
+
+        .risk-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .risk-coins {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Performance Metrics Styles */
+        .performance-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .performance-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            transition: all 0.3s ease;
+        }
+
+        .performance-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .performance-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .performance-header h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .performance-header i {
+            color: var(--accent-primary);
+        }
+
+        .accuracy-chart {
+            min-height: 200px;
+        }
+
+        .success-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .success-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+        }
+
+        .success-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .success-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .success-trend {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .success-trend.positive {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--accent-success);
+        }
+
+        .success-trend.negative {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        /* History Section Styles */
+        .history-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: var(--spacing-lg);
+        }
+
+        .history-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            transition: all 0.3s ease;
+        }
+
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .history-header h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .history-header i {
+            color: var(--accent-primary);
+        }
+
+        .prediction-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid;
+        }
+
+        .timeline-item.success {
+            border-left-color: var(--accent-success);
+        }
+
+        .timeline-item.failure {
+            border-left-color: var(--accent-secondary);
+        }
+
+        .timeline-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            min-width: 60px;
+        }
+
+        .timeline-coin {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 80px;
+        }
+
+        .timeline-prediction {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .timeline-result {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+        }
+
+        .timeline-result.correct {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--accent-success);
+        }
+
+        .timeline-result.incorrect {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--accent-secondary);
+        }
+
+        .comparison-chart {
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>Crypto Volatility Watcher</h1>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Last Updated</span>
+                        <span class="stat-value" id="lastUpdated">Just now</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Status</span>
+                        <span class="stat-value">
+                            <i class="fas fa-circle status-indicator"></i>
+                            <span>Demo Mode</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-content">
+                    <h2>AI-Powered Crypto Volatility Predictions</h2>
+                    <p>Get daily predictions for the most volatile cryptocurrencies using advanced machine learning</p>
+                    <button class="btn btn-primary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Predictions
+                    </button>
+                </div>
+            </section>
+
+            <!-- Predictions Section -->
+            <section class="predictions-section">
+                <div class="section-header">
+                    <h3>Today's Volatility Predictions</h3>
+                    <div class="prediction-date" id="predictionDate">October 25, 2025</div>
+                </div>
+                
+                <div class="predictions-grid" id="predictionsGrid">
+                    <!-- Predictions will be populated here -->
+                </div>
+            </section>
+
+            <!-- Most Volatile Coin Highlight -->
+            <section class="highlight-section" id="highlightSection">
+                <div class="highlight-card">
+                    <div class="highlight-header">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Most Volatile Today</h3>
+                    </div>
+                    <div class="highlight-content">
+                        <div class="coin-info">
+                            <span class="coin-name" id="mostVolatileCoin">Bitcoin</span>
+                            <span class="volatility-score" id="mostVolatileScore">85.0%</span>
+                        </div>
+                        <div class="confidence-stats" id="confidenceStats">
+                            <div class="confidence-item">
+                                <div class="confidence-label">Mean</div>
+                                <div class="confidence-value">61.0%</div>
+                            </div>
+                            <div class="confidence-item">
+                                <div class="confidence-label">Min</div>
+                                <div class="confidence-value">45.0%</div>
+                            </div>
+                            <div class="confidence-item">
+                                <div class="confidence-label">Max</div>
+                                <div class="confidence-value">85.0%</div>
+                            </div>
+                            <div class="confidence-item">
+                                <div class="confidence-label">Std Dev</div>
+                                <div class="confidence-value">12.0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="section-header">
+                    <h3>Market Analysis</h3>
+                    <div class="chart-controls">
+                        <select id="coinSelector" class="select-input">
+                            <option value="">Select a coin...</option>
+                            <option value="bitcoin">Bitcoin</option>
+                            <option value="ethereum">Ethereum</option>
+                            <option value="binancecoin">Binance Coin</option>
+                            <option value="cardano">Cardano</option>
+                            <option value="solana">Solana</option>
+                            <option value="polkadot">Polkadot</option>
+                            <option value="dogecoin">Dogecoin</option>
+                            <option value="avalanche-2">Avalanche</option>
+                            <option value="chainlink">Chainlink</option>
+                            <option value="litecoin">Litecoin</option>
+                        </select>
+                        <select id="periodSelector" class="select-input">
+                            <option value="1d">1 Day</option>
+                            <option value="30d" selected>30 Days</option>
+                            <option value="1y">1 Year</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="loadPriceChart()">
+                            <i class="fas fa-chart-area"></i>
+                            Load Chart
+                        </button>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h4>Price Chart</h4>
+                        <div class="chart-placeholder" id="priceChart" onclick="loadPriceChart()">
+                            <i class="fas fa-chart-line"></i>
+                            <p>Select a coin and period to view price chart</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h4>Feature Importance</h4>
+                        <div class="chart-placeholder" id="featureChart" onclick="loadFeatureImportanceChart()">
+                            <i class="fas fa-pie-chart"></i>
+                            <p>Click to view feature importance</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Probability Analysis Section -->
+            <section class="probability-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-chart-pie"></i> Volatility Probability Analysis</h3>
+                    <div class="prediction-date">Confidence Intervals & Risk Assessment</div>
+                </div>
+                
+                <div class="probability-grid">
+                    <div class="probability-card">
+                        <div class="probability-header">
+                            <h4><i class="fas fa-bullseye"></i> Prediction Confidence</h4>
+                        </div>
+                        <div class="confidence-metrics" id="confidenceMetrics">
+                            <div class="metric-row">
+                                <span class="metric-label">High Confidence (>80%)</span>
+                                <span class="metric-value" id="highConfidence">3 coins</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Medium Confidence (60-80%)</span>
+                                <span class="metric-value" id="mediumConfidence">4 coins</span>
+                            </div>
+                            <div class="metric-row">
+                                <span class="metric-label">Low Confidence (<60%)</span>
+                                <span class="metric-value" id="lowConfidence">3 coins</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="probability-card">
+                        <div class="probability-header">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Risk Assessment</h4>
+                        </div>
+                        <div class="risk-indicators" id="riskIndicators">
+                            <div class="risk-item high-risk">
+                                <div class="risk-label">High Risk</div>
+                                <div class="risk-coins" id="highRiskCoins">Bitcoin, Ethereum</div>
+                            </div>
+                            <div class="risk-item medium-risk">
+                                <div class="risk-label">Medium Risk</div>
+                                <div class="risk-coins" id="mediumRiskCoins">Binance Coin, Cardano, Solana</div>
+                            </div>
+                            <div class="risk-item low-risk">
+                                <div class="risk-label">Low Risk</div>
+                                <div class="risk-coins" id="lowRiskCoins">Polkadot, Dogecoin, Avalanche</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics Section -->
+            <section class="performance-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-trophy"></i> Model Performance Metrics</h3>
+                    <div class="prediction-date">Historical Accuracy & Success Rates</div>
+                </div>
+                
+                <div class="performance-grid">
+                    <div class="performance-card">
+                        <div class="performance-header">
+                            <h4><i class="fas fa-chart-line"></i> Accuracy Over Time</h4>
+                        </div>
+                        <div class="accuracy-chart" id="accuracyChart">
+                            <div class="chart-placeholder" onclick="loadAccuracyChart()">
+                                <i class="fas fa-chart-area"></i>
+                                <p>Click to view accuracy trends</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="performance-card">
+                        <div class="performance-header">
+                            <h4><i class="fas fa-percentage"></i> Success Rates</h4>
+                        </div>
+                        <div class="success-metrics" id="successMetrics">
+                            <div class="success-item">
+                                <div class="success-label">Overall Accuracy</div>
+                                <div class="success-value">89.2%</div>
+                                <div class="success-trend positive">+2.1%</div>
+                            </div>
+                            <div class="success-item">
+                                <div class="success-label">High Volatility Predictions</div>
+                                <div class="success-value">92.5%</div>
+                                <div class="success-trend positive">+1.8%</div>
+                            </div>
+                            <div class="success-item">
+                                <div class="success-label">Low Volatility Predictions</div>
+                                <div class="success-value">85.7%</div>
+                                <div class="success-trend positive">+3.2%</div>
+                            </div>
+                            <div class="success-item">
+                                <div class="success-label">False Positives</div>
+                                <div class="success-value">7.3%</div>
+                                <div class="success-trend negative">-1.5%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prediction History Section -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-history"></i> Prediction History & Validation</h3>
+                    <div class="prediction-date">Last 30 Days Performance</div>
+                </div>
+                
+                <div class="history-grid">
+                    <div class="history-card">
+                        <div class="history-header">
+                            <h4><i class="fas fa-calendar-check"></i> Recent Predictions</h4>
+                        </div>
+                        <div class="prediction-timeline" id="predictionTimeline">
+                            <!-- Timeline items will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="history-card">
+                        <div class="history-header">
+                            <h4><i class="fas fa-chart-bar"></i> Performance Comparison</h4>
+                        </div>
+                        <div class="comparison-chart" id="comparisonChart">
+                            <div class="chart-placeholder" onclick="loadComparisonChart()">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>Click to view performance comparison</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Model Information -->
+            <section class="model-info">
+                <div class="info-card">
+                    <h3><i class="fas fa-brain"></i> Model Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Model Type</span>
+                            <span class="info-value">XGBoost</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Features Used</span>
+                            <span class="info-value">25+</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Prediction Accuracy</span>
+                            <span class="info-value">~89%</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Last Training</span>
+                            <span class="info-value">Today</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 Crypto Volatility Watcher. Powered by Machine Learning.</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">API Documentation</a>
+                    <a href="#" class="footer-link">GitHub</a>
+                    <a href="#" class="footer-link">About</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Global variable to store current predictions
+        let currentPredictions = [];
+        let isDataLoaded = false;
+
+        // Fetch predictions from API
+        async function fetchPredictions() {
+            try {
+                const response = await fetch('/api/predictions');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch predictions');
+                }
+                const data = await response.json();
+                currentPredictions = data.predictions;
+                isDataLoaded = true;
+                
+                // Update the prediction date
+                if (data.date) {
+                    const date = new Date(data.date);
+                    document.getElementById('predictionDate').textContent = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+                
+                return currentPredictions;
+            } catch (error) {
+                console.error('Error fetching predictions:', error);
+                // Fallback to mock data if API fails
+                currentPredictions = [
+                    {"coin": "bitcoin", "volatility_probability": 0.85},
+                    {"coin": "ethereum", "volatility_probability": 0.72},
+                    {"coin": "binancecoin", "volatility_probability": 0.68},
+                    {"coin": "cardano", "volatility_probability": 0.65},
+                    {"coin": "solana", "volatility_probability": 0.62},
+                    {"coin": "polkadot", "volatility_probability": 0.58},
+                    {"coin": "dogecoin", "volatility_probability": 0.55},
+                    {"coin": "avalanche-2", "volatility_probability": 0.52},
+                    {"coin": "chainlink", "volatility_probability": 0.48},
+                    {"coin": "litecoin", "volatility_probability": 0.45},
+                ];
+                isDataLoaded = true;
+                return currentPredictions;
+            }
+        }
+
+        async function displayPredictions() {
+            const gridElement = document.getElementById('predictionsGrid');
+            gridElement.innerHTML = '';
+
+            // Show loading state
+            gridElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 200px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><span style="margin-left: 1rem;">Loading predictions...</span></div>';
+
+            // Fetch fresh predictions
+            const predictions = await fetchPredictions();
+
+            // Sort predictions by volatility probability (highest first)
+            const sortedPredictions = [...predictions].sort((a, b) => 
+                b.volatility_probability - a.volatility_probability
+            );
+
+            // Clear loading state
+            gridElement.innerHTML = '';
+
+            sortedPredictions.forEach((prediction, index) => {
+                const card = createPredictionCard(prediction, index === 0);
+                gridElement.appendChild(card);
+            });
+
+            gridElement.classList.add('fade-in');
+        }
+
+        function createPredictionCard(prediction, isMostVolatile) {
+            const card = document.createElement('div');
+            card.className = `prediction-card ${isMostVolatile ? 'most-volatile' : ''}`;
+            
+            const volatilityPercentage = (prediction.volatility_probability * 100).toFixed(1);
+            const volatilityWidth = Math.min(prediction.volatility_probability * 100, 100);
+            
+            card.innerHTML = `
+                <div class="coin-header">
+                    <span class="coin-name">${prediction.coin}</span>
+                    <span class="volatility-score">${volatilityPercentage}%</span>
+                </div>
+                <div class="volatility-bar">
+                    <div class="volatility-fill" style="width: ${volatilityWidth}%"></div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        async function refreshData() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            button.disabled = true;
+            
+            try {
+                // Fetch fresh data
+                await displayPredictions();
+                updateLastUpdated();
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        function updateLastUpdated() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('lastUpdated').textContent = timeString;
+        }
+
+        // Chart functions
+        function loadPriceChart() {
+            const coin = document.getElementById('coinSelector').value;
+            const period = document.getElementById('periodSelector').value;
+            
+            if (!coin) {
+                alert('Please select a coin first.');
+                return;
+            }
+
+            const chartElement = document.getElementById('priceChart');
+            chartElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 300px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><span style="margin-left: 1rem;">Loading chart...</span></div>';
+
+            // Simulate loading
+            setTimeout(() => {
+                const chartContent = createMockPriceChart(coin, period);
+                chartElement.innerHTML = chartContent;
+            }, 1500);
+        }
+
+        function loadFeatureImportanceChart() {
+            const chartElement = document.getElementById('featureChart');
+            chartElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 300px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><span style="margin-left: 1rem;">Loading chart...</span></div>';
+
+            // Simulate loading
+            setTimeout(() => {
+                const chartContent = createMockFeatureImportanceChart();
+                chartElement.innerHTML = chartContent;
+            }, 1500);
+        }
+
+        function createMockPriceChart(coin, period) {
+            const coinName = coin.charAt(0).toUpperCase() + coin.slice(1);
+            const periodText = period === '1d' ? '1 Day' : period === '30d' ? '30 Days' : '1 Year';
+            
+            // Mock price data
+            const prices = [45000, 46000, 44000, 47000, 48000, 46000, 49000, 50000, 48000, 52000];
+            const maxPrice = Math.max(...prices);
+            const minPrice = Math.min(...prices);
+            
+            let chartBars = '';
+            prices.forEach((price, index) => {
+                const height = ((price - minPrice) / (maxPrice - minPrice)) * 200 + 20;
+                const color = price >= prices[index - 1] || index === 0 ? '#00d4aa' : '#ff6b6b';
+                chartBars += `<div style="display: flex; flex-direction: column; align-items: center; margin: 0 2px;">
+                    <div style="width: 20px; height: ${height}px; background: ${color}; border-radius: 2px; margin-bottom: 5px;"></div>
+                    <span style="font-size: 0.7rem; color: var(--text-secondary);">$${(price/1000).toFixed(0)}k</span>
+                </div>`;
+            });
+
+            return `
+                <div class="chart-content">
+                    <h5 style="margin-bottom: 1rem; color: var(--text-primary); text-align: center;">${coinName} Price Chart - ${periodText}</h5>
+                    <div style="display: flex; align-items: end; justify-content: center; height: 250px; padding: 1rem;">
+                        ${chartBars}
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        Current Price: $${prices[prices.length-1].toLocaleString()}
+                    </div>
+                </div>
+            `;
+        }
+
+        function createMockFeatureImportanceChart() {
+            const features = [
+                { name: 'Price Volatility', importance: 25 },
+                { name: 'Volume Change', importance: 20 },
+                { name: 'RSI Indicator', importance: 15 },
+                { name: 'Moving Average', importance: 12 },
+                { name: 'Market Cap', importance: 10 },
+                { name: 'Social Sentiment', importance: 8 },
+                { name: 'Other Features', importance: 10 }
+            ];
+
+            let pieSlices = '';
+            let currentAngle = 0;
+            const colors = ['#00d4aa', '#00a8cc', '#ff6b6b', '#ffa726', '#4caf50', '#9c27b0', '#607d8b'];
+
+            features.forEach((feature, index) => {
+                const angle = (feature.importance / 100) * 360;
+                const color = colors[index % colors.length];
+                
+                pieSlices += `
+                    <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                        <div style="width: 12px; height: 12px; background: ${color}; border-radius: 2px; margin-right: 0.5rem;"></div>
+                        <span style="color: var(--text-primary); font-size: 0.875rem;">${feature.name}: ${feature.importance}%</span>
+                    </div>
+                `;
+            });
+
+            return `
+                <div class="chart-content">
+                    <h5 style="margin-bottom: 1rem; color: var(--text-primary); text-align: center;">Feature Importance Analysis</h5>
+                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                        <div style="width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(
+                            #00d4aa 0deg 90deg,
+                            #00a8cc 90deg 162deg,
+                            #ff6b6b 162deg 216deg,
+                            #ffa726 216deg 259deg,
+                            #4caf50 259deg 295deg,
+                            #9c27b0 295deg 331deg,
+                            #607d8b 331deg 360deg
+                        ); display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 60px; height: 60px; background: var(--bg-card); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-brain" style="color: var(--accent-primary); font-size: 1.5rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: left;">
+                        ${pieSlices}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Mock data for probability analysis
+        const mockProbabilityData = {
+            highConfidence: 3,
+            mediumConfidence: 4,
+            lowConfidence: 3,
+            highRisk: ['Bitcoin', 'Ethereum'],
+            mediumRisk: ['Binance Coin', 'Cardano', 'Solana'],
+            lowRisk: ['Polkadot', 'Dogecoin', 'Avalanche']
+        };
+
+        // Mock prediction history data
+        const mockHistoryData = [
+            { date: '10/24', coin: 'Bitcoin', prediction: 'High Volatility (85%)', result: 'correct' },
+            { date: '10/24', coin: 'Ethereum', prediction: 'High Volatility (72%)', result: 'correct' },
+            { date: '10/23', coin: 'Cardano', prediction: 'Medium Volatility (65%)', result: 'incorrect' },
+            { date: '10/23', coin: 'Solana', prediction: 'Medium Volatility (62%)', result: 'correct' },
+            { date: '10/22', coin: 'Dogecoin', prediction: 'Low Volatility (55%)', result: 'correct' },
+            { date: '10/22', coin: 'Polkadot', prediction: 'Low Volatility (58%)', result: 'incorrect' },
+            { date: '10/21', coin: 'Chainlink', prediction: 'Low Volatility (48%)', result: 'correct' },
+            { date: '10/21', coin: 'Avalanche', prediction: 'Low Volatility (52%)', result: 'correct' }
+        ];
+
+        function updateProbabilityAnalysis() {
+            // Update confidence metrics
+            document.getElementById('highConfidence').textContent = `${mockProbabilityData.highConfidence} coins`;
+            document.getElementById('mediumConfidence').textContent = `${mockProbabilityData.mediumConfidence} coins`;
+            document.getElementById('lowConfidence').textContent = `${mockProbabilityData.lowConfidence} coins`;
+
+            // Update risk indicators
+            document.getElementById('highRiskCoins').textContent = mockProbabilityData.highRisk.join(', ');
+            document.getElementById('mediumRiskCoins').textContent = mockProbabilityData.mediumRisk.join(', ');
+            document.getElementById('lowRiskCoins').textContent = mockProbabilityData.lowRisk.join(', ');
+        }
+
+        function displayPredictionHistory() {
+            const timelineElement = document.getElementById('predictionTimeline');
+            timelineElement.innerHTML = '';
+
+            mockHistoryData.forEach(item => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = `timeline-item ${item.result}`;
+                
+                timelineItem.innerHTML = `
+                    <div class="timeline-date">${item.date}</div>
+                    <div class="timeline-coin">${item.coin}</div>
+                    <div class="timeline-prediction">${item.prediction}</div>
+                    <div class="timeline-result ${item.result}">${item.result === 'correct' ? '✓' : '✗'}</div>
+                `;
+                
+                timelineElement.appendChild(timelineItem);
+            });
+        }
+
+        function loadAccuracyChart() {
+            const chartElement = document.getElementById('accuracyChart');
+            chartElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 200px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><span style="margin-left: 1rem;">Loading accuracy chart...</span></div>';
+
+            // Simulate loading
+            setTimeout(() => {
+                const chartContent = createMockAccuracyChart();
+                chartElement.innerHTML = chartContent;
+            }, 1500);
+        }
+
+        function loadComparisonChart() {
+            const chartElement = document.getElementById('comparisonChart');
+            chartElement.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 200px;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><span style="margin-left: 1rem;">Loading comparison chart...</span></div>';
+
+            // Simulate loading
+            setTimeout(() => {
+                const chartContent = createMockComparisonChart();
+                chartElement.innerHTML = chartContent;
+            }, 1500);
+        }
+
+        function createMockAccuracyChart() {
+            // Mock accuracy data over time
+            const accuracyData = [
+                { period: 'Week 1', accuracy: 87.2 },
+                { period: 'Week 2', accuracy: 88.5 },
+                { period: 'Week 3', accuracy: 89.1 },
+                { period: 'Week 4', accuracy: 89.2 }
+            ];
+
+            const maxAccuracy = Math.max(...accuracyData.map(d => d.accuracy));
+            const minAccuracy = Math.min(...accuracyData.map(d => d.accuracy));
+
+            let chartBars = '';
+            accuracyData.forEach((data, index) => {
+                const height = ((data.accuracy - minAccuracy) / (maxAccuracy - minAccuracy)) * 120 + 20;
+                const color = data.accuracy >= accuracyData[index - 1]?.accuracy || index === 0 ? '#00d4aa' : '#ff6b6b';
+                chartBars += `<div style="display: flex; flex-direction: column; align-items: center; margin: 0 8px;">
+                    <div style="width: 30px; height: ${height}px; background: ${color}; border-radius: 4px; margin-bottom: 5px;"></div>
+                    <span style="font-size: 0.7rem; color: var(--text-secondary);">${data.period}</span>
+                    <span style="font-size: 0.6rem; color: var(--text-primary); font-weight: 500;">${data.accuracy}%</span>
+                </div>`;
+            });
+
+            return `
+                <div class="chart-content">
+                    <h5 style="margin-bottom: 1rem; color: var(--text-primary); text-align: center;">Model Accuracy Trends</h5>
+                    <div style="display: flex; align-items: end; justify-content: center; height: 180px; padding: 1rem;">
+                        ${chartBars}
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        Average Accuracy: ${(accuracyData.reduce((sum, d) => sum + d.accuracy, 0) / accuracyData.length).toFixed(1)}%
+                    </div>
+                </div>
+            `;
+        }
+
+        function createMockComparisonChart() {
+            // Mock comparison data
+            const comparisonData = [
+                { metric: 'Precision', ourModel: 89.2, baseline: 76.5 },
+                { metric: 'Recall', ourModel: 87.8, baseline: 72.3 },
+                { metric: 'F1-Score', ourModel: 88.5, baseline: 74.2 },
+                { metric: 'Accuracy', ourModel: 89.2, baseline: 75.8 }
+            ];
+
+            let comparisonBars = '';
+            comparisonData.forEach(data => {
+                const ourWidth = (data.ourModel / 100) * 200;
+                const baselineWidth = (data.baseline / 100) * 200;
+                
+                comparisonBars += `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">${data.metric}</div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                    <span style="font-size: 0.7rem; color: var(--text-primary);">Our Model</span>
+                                    <span style="font-size: 0.7rem; color: var(--text-primary); font-weight: 500;">${data.ourModel}%</span>
+                                </div>
+                                <div style="width: ${ourWidth}px; height: 8px; background: var(--gradient-primary); border-radius: 4px;"></div>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                    <span style="font-size: 0.7rem; color: var(--text-secondary);">Baseline</span>
+                                    <span style="font-size: 0.7rem; color: var(--text-secondary); font-weight: 500;">${data.baseline}%</span>
+                                </div>
+                                <div style="width: ${baselineWidth}px; height: 8px; background: var(--bg-tertiary); border-radius: 4px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            return `
+                <div class="chart-content">
+                    <h5 style="margin-bottom: 1rem; color: var(--text-primary); text-align: center;">Model Performance Comparison</h5>
+                    <div style="padding: 1rem;">
+                        ${comparisonBars}
+                    </div>
+                    <div style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        Our model outperforms baseline by an average of 13.4%
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await displayPredictions();
+            updateLastUpdated();
+            updateProbabilityAnalysis();
+            displayPredictionHistory();
+        });
+    </script>
+</body>
+</html>

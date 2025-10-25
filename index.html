@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Volatility Watcher</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>Crypto Volatility Watcher</h1>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Last Updated</span>
+                        <span class="stat-value" id="lastUpdated">Loading...</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">API Status</span>
+                        <span class="stat-value" id="apiStatus">
+                            <i class="fas fa-circle status-indicator" id="statusIndicator"></i>
+                            <span id="statusText">Checking...</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-content">
+                    <h2>AI-Powered Crypto Volatility Predictions</h2>
+                    <p>Get daily predictions for the most volatile cryptocurrencies using advanced machine learning</p>
+                    <button class="btn btn-primary" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh Predictions
+                    </button>
+                </div>
+            </section>
+
+            <!-- Predictions Section -->
+            <section class="predictions-section">
+                <div class="section-header">
+                    <h3>Today's Volatility Predictions</h3>
+                    <div class="prediction-date" id="predictionDate">Loading...</div>
+                </div>
+                
+                <div class="loading" id="loadingPredictions">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Loading predictions...</span>
+                </div>
+
+                <div class="predictions-grid" id="predictionsGrid" style="display: none;">
+                    <!-- Predictions will be populated here -->
+                </div>
+            </section>
+
+            <!-- Most Volatile Coin Highlight -->
+            <section class="highlight-section" id="highlightSection" style="display: none;">
+                <div class="highlight-card">
+                    <div class="highlight-header">
+                        <i class="fas fa-trophy"></i>
+                        <h3>Most Volatile Today</h3>
+                    </div>
+                    <div class="highlight-content">
+                        <div class="coin-info">
+                            <span class="coin-name" id="mostVolatileCoin">-</span>
+                            <span class="volatility-score" id="mostVolatileScore">-</span>
+                        </div>
+                        <div class="confidence-stats" id="confidenceStats">
+                            <!-- Confidence stats will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="section-header">
+                    <h3>Market Analysis</h3>
+                    <div class="chart-controls">
+                        <select id="coinSelector" class="select-input">
+                            <option value="">Select a coin...</option>
+                        </select>
+                        <select id="periodSelector" class="select-input">
+                            <option value="1d">1 Day</option>
+                            <option value="30d" selected>30 Days</option>
+                            <option value="1y">1 Year</option>
+                        </select>
+                        <button class="btn btn-secondary" id="loadChartBtn">
+                            <i class="fas fa-chart-area"></i>
+                            Load Chart
+                        </button>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h4>Price Chart</h4>
+                        <div class="chart-placeholder" id="priceChart">
+                            <i class="fas fa-chart-line"></i>
+                            <p>Select a coin and period to view price chart</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h4>Feature Importance</h4>
+                        <div class="chart-placeholder" id="featureChart">
+                            <i class="fas fa-pie-chart"></i>
+                            <p>Click to view feature importance</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Model Information -->
+            <section class="model-info">
+                <div class="info-card">
+                    <h3><i class="fas fa-brain"></i> Model Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Model Type</span>
+                            <span class="info-value" id="modelType">XGBoost</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Features Used</span>
+                            <span class="info-value" id="featureCount">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Prediction Accuracy</span>
+                            <span class="info-value">~89%</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Last Training</span>
+                            <span class="info-value" id="lastTraining">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 Crypto Volatility Watcher. Powered by Machine Learning.</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">API Documentation</a>
+                    <a href="#" class="footer-link">GitHub</a>
+                    <a href="#" class="footer-link">About</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

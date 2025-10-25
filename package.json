@@ -1,0 +1,27 @@
+{
+  "name": "crypto-volatility-watcher",
+  "version": "1.0.0",
+  "description": "AI-Powered Crypto Volatility Predictions with Daily Updates",
+  "main": "standalone.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "crypto",
+    "volatility",
+    "predictions",
+    "machine-learning",
+    "trading"
+  ],
+  "author": "Crypto Volatility Watcher",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}
